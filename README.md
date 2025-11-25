@@ -4,28 +4,43 @@ A modern web application combining a playable Tetris game with complex number vi
 
 ## Features
 
-### 🎮 Complex Tetris Game
+### 🎮 Tetris Game (Normal Mode)
 - **Complex Number Rotations**: Tetris pieces rotate using complex number mathematics (z → i·z for 90° rotation)
 - **Classic Gameplay**: Traditional Tetris mechanics with modern UI
 - **Score Tracking**: Keep track of your score, level, and cleared lines
 - **Responsive Controls**: Keyboard controls with visual feedback
 - **Game States**: Pause, resume, and restart functionality
 
+### 🔬 Complex Tetris Mode (Experimental)
+- **Four Complex Transformations**:
+  - f(z) = i·z (90° rotation)
+  - f(z) = z² (square function)
+  - f(z) = eᶻ (exponential function)
+  - f(z) = 1/z (reciprocal function)
+- **Snap-to-Grid**: Transformations round to nearest integer positions
+- **Position Recovery**: Automatic offset adjustment if transformation lands out-of-bounds
+- **Full Tetris Mechanics**: All standard Tetris features with complex transformations
+
 ### 📊 Complex Function Visualizer
-- **Three Complex Functions**:
+- **Four Complex Functions**:
+  - f(z) = i·z (rotation by 90°)
   - f(z) = z² (square function)
   - f(z) = eᶻ (exponential function)
   - f(z) = 1/z (reciprocal function)
 - **Animated Transformations**: Watch the complex plane transform in real-time
+- **Tetris Piece Overlay**: See current Tetris piece on complex plane (purple)
+- **Transformation Preview**: Visualize transformed piece positions (cyan)
+- **Rotation Animation**: Yellow arrow shows z → i·z rotation
 - **Magnitude & Phase Overlays**: Toggle visual representation of magnitude (brightness) and phase (color hue)
 - **Unit Circle Tracking**: See how the unit circle transforms under each function
-- **Rotation Visualization**: Highlighted z → i·z rotations showing 90° counterclockwise rotation
 
 ### 🎨 User Interface
 - **Modern Design**: Gradient backgrounds and smooth animations
+- **Mode Toggle**: Switch between Normal Tetris and Complex Tetris modes
 - **Responsive Layout**: Works on desktop, tablet, and mobile devices
 - **Side-by-side Panels**: Tetris game and visualizer displayed together
 - **Interactive Controls**: Easy-to-use buttons and toggles
+- **Color-Coded Legend**: Visual indicators for original and transformed piece positions
 
 ## Mathematical Background
 
@@ -110,15 +125,30 @@ Since complex functions map 2D → 2D (would need 4D to graph traditionally), we
 - Möbius transformation (conformal mapping)
 - Unit circle maps to itself with reversed orientation
 
-This project uses **complex numbers** to elegantly handle Tetris piece rotations. In the complex plane:
-- Each block position is represented as a complex number z = x + yi
-- Rotation by 90° counterclockwise is achieved by multiplying by i: z → i·z
-- This is mathematically equivalent to: (x, y) → (-y, x)
+#### Visualizer Features
 
-The visualizer demonstrates three fundamental complex functions:
-- **z²**: Doubles the angle and squares the magnitude
-- **eᶻ**: The complex exponential, fundamental to Fourier analysis
-- **1/z**: Inverts and reflects across the real axis
+The visualizer now includes:
+- **Real-time Tetris piece overlay**: Current piece shown in purple on the complex plane
+- **Transformation preview**: See where piece blocks would move after transformation (cyan)
+- **Color-coded legend**: 
+  - Purple = Original piece position
+  - Cyan = Transformed piece position
+  - Yellow arrow = Rotation by i (90° clockwise in screen coordinates)
+- **Unified coordinate system**: Both Tetris and visualizer use screen coordinates (Y+ downward)
+
+#### Complex Tetris Mode Implementation
+
+The experimental Complex Tetris Mode applies transformations to piece blocks:
+1. **Apply transformation**: Each block position z → f(z)
+2. **Snap to grid**: Round real and imaginary parts to nearest integer
+3. **Position recovery**: If out-of-bounds, try offsets from -2 to +2
+4. **Collision detection**: Uses standard Tetris collision rules
+
+This creates interesting gameplay where:
+- **i·z**: Standard 90° rotation (same as normal mode)
+- **z²**: Pieces expand and rotate by double angle
+- **eᶻ**: Exponential growth based on position
+- **1/z**: Pieces flip and invert distances from origin
 
 ## Installation
 
@@ -155,16 +185,27 @@ The application will open in your browser at `http://localhost:3000`
 
 ## Game Controls
 
-### Tetris
+### Normal Tetris Mode
 - **←/→ Arrow Keys**: Move piece left/right
 - **↑ Arrow or Space**: Rotate piece (z → i·z)
 - **↓ Arrow**: Soft drop (move down faster)
 - **Enter**: Hard drop (instant drop)
 - **P**: Pause/Resume game
 - **R**: Restart game (when game over)
+- **Toggle Mode Button**: Switch to Complex Tetris Mode
+
+### Complex Tetris Mode
+- **←/→ Arrow Keys**: Move piece left/right
+- **↑ Arrow or Space**: Apply selected complex transformation
+- **↓ Arrow**: Soft drop (move down faster)
+- **Enter**: Hard drop (instant drop)
+- **P**: Pause/Resume game
+- **R**: Restart game (when game over)
+- **Function Buttons**: Select transformation (i·z, z², eᶻ, 1/z)
+- **Toggle Mode Button**: Switch to Normal Tetris Mode
 
 ### Visualizer
-- **Function Buttons**: Select z², eᶻ, or 1/z
+- **Function Buttons**: Select i·z, z², eᶻ, or 1/z
 - **Magnitude Checkbox**: Toggle magnitude overlay
 - **Phase Checkbox**: Toggle phase overlay
 - **Animate Button**: Replay transformation animation
@@ -175,27 +216,28 @@ The application will open in your browser at `http://localhost:3000`
 Tetris/
 ├── src/
 │   ├── components/
-│   │   ├── TetrisGame.jsx        # Tetris game component
-│   │   ├── TetrisGame.css        # Tetris styles
-│   │   ├── ComplexVisualizer.jsx # Function visualizer
-│   │   └── ComplexVisualizer.css # Visualizer styles
+│   │   ├── TetrisGame.jsx           # Normal Tetris game component
+│   │   ├── TetrisGame.css           # Tetris styles
+│   │   ├── ComplexTetrisGame.jsx    # Complex transformation game mode
+│   │   ├── ComplexVisualizer.jsx    # Function visualizer
+│   │   └── ComplexVisualizer.css    # Visualizer styles
 │   ├── utils/
-│   │   ├── complex.js            # Complex number library
-│   │   └── tetris.js             # Tetris game logic
+│   │   ├── complex.js               # Complex number library
+│   │   └── tetris.js                # Tetris game logic
 │   ├── tests/
-│   │   ├── complex.test.js       # Complex number tests
-│   │   └── tetris.test.js        # Tetris logic tests
-│   ├── App.jsx                   # Main application
-│   ├── App.css                   # App styles
-│   └── main.jsx                  # Entry point
-├── public/                       # Static assets
-├── index.html                    # HTML template
-├── vite.config.js               # Vite configuration
-├── jest.config.js               # Jest configuration
-├── .eslintrc.json               # ESLint configuration
-├── .prettierrc.json             # Prettier configuration
-├── package.json                 # Dependencies and scripts
-└── LICENSE                      # MIT License
+│   │   ├── complex.test.js          # Complex number tests
+│   │   └── tetris.test.js           # Tetris logic tests
+│   ├── App.jsx                      # Main application with mode toggle
+│   ├── App.css                      # App styles
+│   └── main.jsx                     # Entry point
+├── public/                          # Static assets
+├── index.html                       # HTML template
+├── vite.config.js                   # Vite configuration
+├── jest.config.js                   # Jest configuration
+├── eslint.config.js                 # ESLint configuration
+├── package.json                     # Dependencies and scripts
+└── LICENSE                          # MIT License
+```
 
 ## Technologies Used
 
@@ -253,13 +295,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Future Enhancements
 
 Potential improvements:
-- Additional complex functions (sin, cos, log)
-- 3D visualization of complex surfaces
-- Multiplayer mode
+- Additional complex functions (ln(z), sin(z), cos(z))
+- More sophisticated transformation recovery algorithms
+- Multiplayer mode with synchronized transformations
 - Custom color themes
 - Sound effects and music
-- High score persistence
-- More piece types
+- High score persistence with leaderboards
+- Animation speed controls
+- Function composition mode f(g(z))
 
 ---
 
