@@ -182,22 +182,18 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
       }
       ctx.stroke();
 
-      // Highlight rotation - show visual CW rotation (matches screen coordinates)
+      // Highlight rotation - show visual CW rotation (matches screen coordinates with Y+ down)
       if (func === 'square' || !isAnimating) {
         ctx.strokeStyle = '#ff0';
         ctx.lineWidth = 2;
 
-        // Draw arrow showing visual rotation direction (CW on screen due to Y-flip)
-        // Start with a point in upper-right quadrant
+        // Draw arrow showing rotation direction
+        // Y+ is down, so i·z rotation appears CW visually
         const sampleZ = Complex.complex(1.5, 0.5);
         const rotated = Complex.rotateByI(sampleZ);
         
-        // Apply Y-flip to both points to show screen-space rotation
-        const startScreen = Complex.complex(sampleZ.re, -sampleZ.im);
-        const endScreen = Complex.complex(rotated.re, -rotated.im);
-
-        const start = complexToCanvas(startScreen);
-        const end = complexToCanvas(endScreen);
+        const start = complexToCanvas(sampleZ);
+        const end = complexToCanvas(rotated);
 
         // Arrow line
         ctx.beginPath();
@@ -223,6 +219,7 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
 
       // Draw Tetris piece if provided
       if (tetrisPieceRef.current && tetrisPieceRef.current.piece) {
+        // Draw original piece positions (purple/magenta)
         ctx.strokeStyle = '#ff00ff';
         ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
         ctx.lineWidth = 3;
@@ -233,6 +230,21 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
           ctx.fillRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
           ctx.strokeRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
         });
+
+        // Draw transformed piece positions when not using rotation function (cyan)
+        if (func !== 'rotation') {
+          ctx.strokeStyle = '#00ffff';
+          ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+          ctx.lineWidth = 3;
+
+          tetrisPieceRef.current.piece.forEach((complexPos) => {
+            const transformed = Complex.applyFunction(func, complexPos);
+            const { x, y } = complexToCanvas(transformed);
+            const blockSize = 15;
+            ctx.fillRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
+            ctx.strokeRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
+          });
+        }
 
         ctx.fillStyle = '#ff00ff';
         ctx.beginPath();
@@ -251,6 +263,30 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
         reciprocal: 'f(z) = 1/z',
       };
       ctx.fillText(funcLabels[func], 10, 25);
+
+      // Legend for piece colors
+      if (tetrisPieceRef.current && tetrisPieceRef.current.piece) {
+        ctx.font = '12px monospace';
+        const legendY = GRID_SIZE - 40;
+        
+        // Purple square
+        ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
+        ctx.strokeStyle = '#ff00ff';
+        ctx.fillRect(10, legendY, 12, 12);
+        ctx.strokeRect(10, legendY, 12, 12);
+        ctx.fillStyle = '#fff';
+        ctx.fillText('Original piece', 28, legendY + 10);
+        
+        // Cyan square (only for non-rotation functions)
+        if (func !== 'rotation') {
+          ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+          ctx.strokeStyle = '#00ffff';
+          ctx.fillRect(10, legendY + 18, 12, 12);
+          ctx.strokeRect(10, legendY + 18, 12, 12);
+          ctx.fillStyle = '#fff';
+          ctx.fillText('After ' + funcLabels[func], 28, legendY + 28);
+        }
+      }
     },
     [complexToCanvas, showMagnitude, showPhase, isAnimating]
   );

@@ -43,6 +43,30 @@ body {
   font-style: italic;
 }
 
+.mode-toggle {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  border: 2px solid #e74c3c;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+}
+
+.mode-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(231, 76, 60, 0.6);
+  background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+}
+
+.mode-toggle:active {
+  transform: translateY(0);
+}
+
 .app-main {
   flex: 1;
   display: flex;
@@ -54,6 +78,12 @@ body {
 }
 
 .panel {
+  flex: 1;
+  min-width: 350px;
+  max-width: 600px;
+}
+
+.complex-tetris-panel {
   flex: 1;
   min-width: 350px;
   max-width: 600px;
