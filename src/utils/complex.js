@@ -138,6 +138,8 @@ export const fromPolar = (r, theta) => complex(r * Math.cos(theta), r * Math.sin
  */
 export const applyFunction = (functionType, z) => {
   switch (functionType) {
+    case 'rotation':
+      return rotateByI(z);
     case 'square':
       return square(z);
     case 'exp':

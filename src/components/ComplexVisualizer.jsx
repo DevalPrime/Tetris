@@ -18,7 +18,7 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
   // Convert complex number to canvas coordinates
   const complexToCanvas = useCallback((z) => {
     const x = (z.re / GRID_RANGE) * (GRID_SIZE / 2) + GRID_SIZE / 2;
-    const y = -(z.im / GRID_RANGE) * (GRID_SIZE / 2) + GRID_SIZE / 2;
+    const y = (z.im / GRID_RANGE) * (GRID_SIZE / 2) + GRID_SIZE / 2;
     return { x, y };
   }, []);
 
@@ -117,12 +117,18 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
           // Apply transformation with animation
           let transformed;
           if (progress < 1 && isAnimating) {
-            // Interpolate between original and transformed
-            const fullTransform = Complex.applyFunction(func, z);
-            transformed = Complex.complex(
-              z.re + (fullTransform.re - z.re) * progress,
-              z.im + (fullTransform.im - z.im) * progress
-            );
+            if (func === 'rotation') {
+              // For rotation, rotate the point progressively
+              const angle = (Math.PI / 2) * progress; // 0 to 90°
+              transformed = Complex.rotate(z, angle);
+            } else {
+              // Interpolate between original and transformed
+              const fullTransform = Complex.applyFunction(func, z);
+              transformed = Complex.complex(
+                z.re + (fullTransform.re - z.re) * progress,
+                z.im + (fullTransform.im - z.im) * progress
+              );
+            }
           } else {
             transformed = Complex.applyFunction(func, z);
           }
@@ -148,11 +154,19 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
 
         let transformed;
         if (progress < 1 && isAnimating) {
-          const fullTransform = Complex.applyFunction(func, z);
-          transformed = Complex.complex(
-            z.re + (fullTransform.re - z.re) * progress,
-            z.im + (fullTransform.im - z.im) * progress
-          );
+          if (func === 'rotation') {
+            // For rotation, interpolate the angle not the position
+            const angle = Complex.phase(z);
+            const targetAngle = angle + Math.PI / 2; // Add 90° for i·z
+            const currentAngle = angle + (Math.PI / 2) * progress;
+            transformed = Complex.fromPolar(1, currentAngle);
+          } else {
+            const fullTransform = Complex.applyFunction(func, z);
+            transformed = Complex.complex(
+              z.re + (fullTransform.re - z.re) * progress,
+              z.im + (fullTransform.im - z.im) * progress
+            );
+          }
         } else {
           transformed = Complex.applyFunction(func, z);
         }
@@ -207,17 +221,14 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
         ctx.stroke();
       }
 
-      // Draw Tetris piece if provided (flip Y to match game board coordinates)
+      // Draw Tetris piece if provided
       if (tetrisPieceRef.current && tetrisPieceRef.current.piece) {
         ctx.strokeStyle = '#ff00ff';
         ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
         ctx.lineWidth = 3;
 
         tetrisPieceRef.current.piece.forEach((complexPos) => {
-          // Flip Y-axis: game uses screen coordinates (positive Im = down)
-          // Visualizer uses math coordinates (positive Im = up)
-          const vizPos = Complex.complex(complexPos.re, -complexPos.im);
-          const { x, y } = complexToCanvas(vizPos);
+          const { x, y } = complexToCanvas(complexPos);
           const blockSize = 15;
           ctx.fillRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
           ctx.strokeRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
@@ -234,6 +245,7 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 18px monospace';
       const funcLabels = {
+        rotation: 'f(z) = i·z (Tetris Rotation)',
         square: 'f(z) = z²',
         exp: 'f(z) = eᶻ',
         reciprocal: 'f(z) = 1/z',
@@ -305,6 +317,13 @@ const ComplexVisualizer = ({ tetrisPiece }) => {
         <div className="function-selector">
           <h3>Select Function</h3>
           <div className="function-buttons">
+            <button
+              className={selectedFunction === 'rotation' ? 'active' : ''}
+              onClick={() => handleFunctionChange('rotation')}
+              title="Tetris Rotation: z → i·z"
+            >
+              i·z
+            </button>
             <button
               className={selectedFunction === 'square' ? 'active' : ''}
               onClick={() => handleFunctionChange('square')}
