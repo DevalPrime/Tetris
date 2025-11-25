@@ -29,6 +29,87 @@ A modern web application combining a playable Tetris game with complex number vi
 
 ## Mathematical Background
 
+### Complex Number Rotation Theory
+
+This project demonstrates the **elegance of complex number rotations** compared to traditional matrix methods.
+
+#### Why Complex Numbers for Rotation?
+
+**Traditional approach** (Rotation matrix for 90° CCW):
+```
+[x']   [cos(90°)  -sin(90°)] [x]   [0  -1] [x]   [-y]
+[y'] = [sin(90°)   cos(90°)] [y] = [1   0] [y] = [x]
+```
+
+**Complex number approach**:
+```
+z' = i · z
+where z = x + yi and i² = -1
+
+Proof:
+i · (x + yi) = ix + i²y = ix - y = -y + ix
+Therefore: (x, y) → (-y, x)  ✓
+```
+
+**Advantages**:
+- Single multiplication operation instead of matrix multiplication
+- More intuitive (rotation = multiplication by unit complex number)
+- Easier to compose rotations: (i·z)·i = i²·z = -z (180° rotation)
+- Generalizes to arbitrary angles: e^(iθ)·z rotates by angle θ
+
+#### Tetris Implementation
+
+Each piece is defined as an array of complex numbers relative to origin:
+```javascript
+T-piece: [(-1, 0), (0, 0), (1, 0), (0, 1)]
+    □         blocks centered at origin
+  □ ■ □       rotates around the middle block
+```
+
+Rotation is simply: `piece.map(z => i·z)`
+
+### Complex Function Visualizer
+
+The visualizer uses **domain coloring** to represent complex functions f: ℂ → ℂ.
+
+#### Domain Coloring Technique
+
+Since complex functions map 2D → 2D (would need 4D to graph traditionally), we use color encoding:
+- **Hue (color)** = arg(f(z)) ∈ [-π, π] mapped to [0°, 360°]
+- **Lightness (brightness)** = |f(z)| (magnitude)
+
+**Color wheel mapping**:
+- -π (negative real axis) → Red (0°)
+- -π/2 (negative imaginary axis) → Green (90°)  
+- 0 (positive real axis) → Cyan (180°)
+- π/2 (positive imaginary axis) → Blue (270°)
+- π wraps back to Red
+
+#### The Three Functions
+
+**1. f(z) = z²** (Polynomial)
+- Doubles argument: arg(z²) = 2·arg(z)
+- Squares magnitude: |z²| = |z|²
+- Critical point at z = 0
+- Conformal (angle-preserving) everywhere except origin
+- Unit circle maps to itself (since |z|=1 ⇒ |z²|=1)
+
+**2. f(z) = eᶻ** (Transcendental)
+- Euler's formula: e^(x+iy) = e^x · (cos y + i sin y)
+- Magnitude: |e^z| = e^(Re z) (depends only on real part)
+- Phase: arg(e^z) = Im(z) (mod 2π) (periodic in imaginary direction)
+- Maps vertical strips to sectors around origin
+- Entire function (holomorphic everywhere)
+- No zeros
+
+**3. f(z) = 1/z** (Rational/Meromorphic)
+- Inverts magnitude: |1/z| = 1/|z|
+- Reverses phase: arg(1/z) = -arg(z)
+- Pole (singularity) at z = 0
+- Swaps interior/exterior of unit circle
+- Möbius transformation (conformal mapping)
+- Unit circle maps to itself with reversed orientation
+
 This project uses **complex numbers** to elegantly handle Tetris piece rotations. In the complex plane:
 - Each block position is represented as a complex number z = x + yi
 - Rotation by 90° counterclockwise is achieved by multiplying by i: z → i·z

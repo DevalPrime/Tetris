@@ -69,7 +69,9 @@ export const phase = (z) => Math.atan2(z.im, z.re);
 /**
  * Rotates a complex number by multiplying by i (90° counterclockwise)
  * This implements the key rotation z → i·z
- * @param {Object} z - Complex number
+ * Mathematical: (x + yi) × i = xi + yi² = -y + xi, so (x,y) → (-y, x)
+ * Note: In screen coordinates where Y-down, this appears as clockwise rotation
+ * @param {Object} z - Complex number  
  * @returns {Object} Rotated complex number
  */
 export const rotateByI = (z) => complex(-z.im, z.re);

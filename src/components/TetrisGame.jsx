@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Tetris from '../utils/tetris.js';
 import './TetrisGame.css';
 
-const TetrisGame = () => {
+const TetrisGame = ({ onRotate }) => {
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState(Tetris.createInitialState());
   const [showRotationVisualization, setShowRotationVisualization] = useState(false);
@@ -162,11 +162,21 @@ const TetrisGame = () => {
       if (Tetris.isValidPosition(rotatedPiece, prevState.piecePosition, prevState.board)) {
         setShowRotationVisualization(true);
         setTimeout(() => setShowRotationVisualization(false), 300);
+        
+        // Notify parent component about the rotation
+        if (onRotate) {
+          onRotate({
+            piece: rotatedPiece,
+            type: prevState.currentPieceType,
+            position: prevState.piecePosition,
+          });
+        }
+        
         return { ...prevState, currentPiece: rotatedPiece };
       }
       return prevState;
     });
-  }, []);
+  }, [onRotate]);
 
   // Hard drop
   const hardDrop = useCallback(() => {
@@ -265,6 +275,17 @@ const TetrisGame = () => {
   useEffect(() => {
     draw(gameState);
   }, [gameState, draw]);
+
+  // Send current piece to visualizer whenever it changes
+  useEffect(() => {
+    if (onRotate && gameState.currentPiece && gameState.currentPieceType) {
+      onRotate({
+        piece: gameState.currentPiece,
+        type: gameState.currentPieceType,
+        position: gameState.piecePosition,
+      });
+    }
+  }, [gameState.currentPiece, gameState.currentPieceType, gameState.piecePosition, onRotate]);
 
   return (
     <div className="tetris-game">

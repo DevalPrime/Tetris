@@ -2,13 +2,14 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Complex from '../utils/complex.js';
 import './ComplexVisualizer.css';
 
-const ComplexVisualizer = () => {
+const ComplexVisualizer = ({ tetrisPiece }) => {
   const canvasRef = useRef(null);
   const [selectedFunction, setSelectedFunction] = useState('square');
   const [showMagnitude, setShowMagnitude] = useState(true);
   const [showPhase, setShowPhase] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
   const animationRef = useRef(null);
+  const tetrisPieceRef = useRef(null);
 
   const GRID_SIZE = 400;
   const GRID_RANGE = 3; // -3 to 3 on both axes
@@ -34,6 +35,8 @@ const ComplexVisualizer = () => {
 
     if (showPh) {
       // Map phase (-π to π) to hue (0 to 360)
+      // Phase mapping: -π (negative Re) → 0° (red), 0 (positive Re) → 180° (cyan)
+      //                π/2 (positive Im) → 270° (blue), -π/2 (negative Im) → 90° (green)
       hue = ((ph + Math.PI) / (2 * Math.PI)) * 360;
       saturation = 80;
     }
@@ -165,17 +168,22 @@ const ComplexVisualizer = () => {
       }
       ctx.stroke();
 
-      // Highlight rotation z → i·z
+      // Highlight rotation - show visual CW rotation (matches screen coordinates)
       if (func === 'square' || !isAnimating) {
         ctx.strokeStyle = '#ff0';
         ctx.lineWidth = 2;
 
-        // Draw arrow showing z → i·z rotation for a sample point
+        // Draw arrow showing visual rotation direction (CW on screen due to Y-flip)
+        // Start with a point in upper-right quadrant
         const sampleZ = Complex.complex(1.5, 0.5);
         const rotated = Complex.rotateByI(sampleZ);
+        
+        // Apply Y-flip to both points to show screen-space rotation
+        const startScreen = Complex.complex(sampleZ.re, -sampleZ.im);
+        const endScreen = Complex.complex(rotated.re, -rotated.im);
 
-        const start = complexToCanvas(sampleZ);
-        const end = complexToCanvas(rotated);
+        const start = complexToCanvas(startScreen);
+        const end = complexToCanvas(endScreen);
 
         // Arrow line
         ctx.beginPath();
@@ -197,6 +205,29 @@ const ComplexVisualizer = () => {
           end.y - 10 * Math.sin(angle + Math.PI / 6)
         );
         ctx.stroke();
+      }
+
+      // Draw Tetris piece if provided (flip Y to match game board coordinates)
+      if (tetrisPieceRef.current && tetrisPieceRef.current.piece) {
+        ctx.strokeStyle = '#ff00ff';
+        ctx.fillStyle = 'rgba(255, 0, 255, 0.3)';
+        ctx.lineWidth = 3;
+
+        tetrisPieceRef.current.piece.forEach((complexPos) => {
+          // Flip Y-axis: game uses screen coordinates (positive Im = down)
+          // Visualizer uses math coordinates (positive Im = up)
+          const vizPos = Complex.complex(complexPos.re, -complexPos.im);
+          const { x, y } = complexToCanvas(vizPos);
+          const blockSize = 15;
+          ctx.fillRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
+          ctx.strokeRect(x - blockSize / 2, y - blockSize / 2, blockSize, blockSize);
+        });
+
+        ctx.fillStyle = '#ff00ff';
+        ctx.beginPath();
+        const center = complexToCanvas(Complex.complex(0, 0));
+        ctx.arc(center.x, center.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
       }
 
       // Function label
@@ -255,6 +286,14 @@ const ComplexVisualizer = () => {
     setSelectedFunction(func);
     setIsAnimating(true);
   };
+
+  // Update piece ref without triggering animation restarts
+  useEffect(() => {
+    tetrisPieceRef.current = tetrisPiece || null;
+    if (!isAnimating) {
+      drawVisualization(selectedFunction, 1);
+    }
+  }, [tetrisPiece, isAnimating, selectedFunction, drawVisualization]);
 
   return (
     <div className="complex-visualizer">
@@ -316,7 +355,8 @@ const ComplexVisualizer = () => {
       </div>
       <div className="visualizer-info">
         <p>🟢 Green: Unit circle transformation</p>
-        <p>🟡 Yellow: z → i·z rotation (90° CCW)</p>
+        <p>🟡 Yellow: Rotation direction (clockwise as seen in Tetris game)</p>
+        <p>🟣 Magenta: Current Tetris piece (rotates when you play!)</p>
         <p>Color hue represents phase, brightness represents magnitude</p>
       </div>
     </div>
