@@ -1,15 +1,57 @@
+<div style="page-break-after: always;"></div>
+
 # Repository Report: Complex Tetris & Visualizer
+
+<div align="center">
+
+**Technical Documentation**
+
+Version 1.0
+
+Date: November 2025
+
+Repository: DevalPrime/Tetris
+
+</div>
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Project Structure](#project-structure)
+3. [Core Components](#core-components)
+4. [Utility Modules](#utility-modules)
+5. [Testing](#testing)
+6. [CI/CD Pipeline](#cicd-pipeline)
+7. [Available Scripts](#available-scripts)
+8. [Mathematical Background](#mathematical-background)
+9. [Experimental Section: Complex Tetris Mode](#experimental-section-complex-tetris-mode)
+10. [Browser Support](#browser-support)
+11. [License](#license)
+
+---
+
+<div style="page-break-after: always;"></div>
 
 ## Overview
 
 This repository contains a modern web application that combines a playable Tetris game with complex number visualizations. The project demonstrates the mathematical elegance of using complex numbers for geometric transformations, particularly rotations, as an alternative to traditional matrix-based approaches.
 
-**Tech Stack:**
-- React 19 (UI framework)
-- Vite 7 (build tool and dev server)
-- Canvas API (game rendering and visualizations)
-- Jest 30 (testing framework)
-- ESLint 9 / Prettier 3 (code quality)
+### Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React | 19 | UI framework |
+| Vite | 7 | Build tool and dev server |
+| Canvas API | - | Game rendering and visualizations |
+| Jest | 30 | Testing framework |
+| ESLint | 9 | Code linting |
+| Prettier | 3 | Code formatting |
+
+---
+
+<div style="page-break-after: always;"></div>
 
 ## Project Structure
 
@@ -43,6 +85,10 @@ Tetris/
 ├── LICENSE                          # MIT License
 └── README.md                        # Project documentation
 ```
+
+---
+
+<div style="page-break-after: always;"></div>
 
 ## Core Components
 
@@ -81,6 +127,10 @@ A visualization tool for complex functions that demonstrates the mathematical co
 - Toggle for magnitude/phase overlays
 - Unit circle transformation tracking
 - Real-time Tetris piece visualization
+
+---
+
+<div style="page-break-after: always;"></div>
 
 ## Utility Modules
 
@@ -134,6 +184,10 @@ Tetris game logic using complex numbers for piece representation:
 - `BOARD_HEIGHT`: 20 cells
 - `CELL_SIZE`: 30 pixels
 
+---
+
+<div style="page-break-after: always;"></div>
+
 ## Testing
 
 The project includes comprehensive unit tests using Jest:
@@ -159,6 +213,10 @@ The project includes comprehensive unit tests using Jest:
 - Line clearing (single, multiple, incomplete)
 - Score calculation at different levels
 - Initial game state
+
+---
+
+<div style="page-break-after: always;"></div>
 
 ## CI/CD Pipeline
 
@@ -189,6 +247,10 @@ The repository includes a GitHub Actions workflow (`.github/workflows/ci.yml`) t
 | `npm run format` | Format with Prettier |
 | `npm run format:check` | Check formatting |
 
+---
+
+<div style="page-break-after: always;"></div>
+
 ## Mathematical Background
 
 ### Why Complex Numbers for Rotation?
@@ -216,6 +278,10 @@ Therefore: (x, y) → (-y, x)
 - Intuitive (rotation = multiplication by unit complex number)
 - Composable: `(i·z)·i = i²·z = -z` (180° rotation)
 - Generalizes to arbitrary angles
+
+---
+
+<div style="page-break-after: always;"></div>
 
 ---
 
@@ -289,6 +355,10 @@ The codebase is structured to support additional experimental features:
 
 ---
 
+<div style="page-break-after: always;"></div>
+
+---
+
 ## Browser Support
 
 The application requires modern browser features:
@@ -302,4 +372,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
+<div align="center">
+
 *Report generated for the DevalPrime/Tetris repository*
+
+**End of Document**
+
+</div>
