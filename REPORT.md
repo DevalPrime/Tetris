@@ -283,8 +283,6 @@ Therefore: (x, y) → (-y, x)
 
 <div style="page-break-after: always;"></div>
 
----
-
 ## Experimental Section: Complex Tetris Mode
 
 > ⚠️ **EXPERIMENTAL FEATURE** - This section documents features that are experimental and may behave unexpectedly.
@@ -356,8 +354,6 @@ The codebase is structured to support additional experimental features:
 ---
 
 <div style="page-break-after: always;"></div>
-
----
 
 ## Browser Support
 
